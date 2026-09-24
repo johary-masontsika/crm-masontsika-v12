@@ -1,1 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; color: #333; }
+    .container { max-width: 650px; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin: auto; }
+    h2 { color: #2c3e50; text-align: center; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; font-weight: bold; margin-bottom: 5px; }
+    select, input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    button { background-color: #3498db; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; }
+    button:hover { background-color: #2980b9; }
+    .hidden { display: none; }
+    .sheet-links { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+    .sheet-btn { background-color: #27ae60; color: white; text-align: center; padding: 12px; text-decoration: none; border-radius: 4px; font-weight: bold; }
+    .sheet-btn.external { background-color: #c0392b; } /* X mena = rohy ivelany na fanokafana mivantana */
+    .link-input-group { background: #f9f9f9; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 8px; }
+    .link-input-group label { font-size: 13px; color: #555; }
+    .link-input-group input { margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>CRM MASONTSIKA V12</h2>
+    
+    <div class="form-group">
+      <label for="choixPrincipal">Safidy Voalohany (Choix Principal):</label>
+      <select id="choixPrincipal" onchange="handleMainChoice()">
+        <option value="">-- Safidio ny asa --</option>
+        <option value="Appel">Appel</option>
+        <option value="Complement">Complément du Sheet</option>
+      </select>
+    </div>
 
+    <!-- Fizarana APPEL -->
+    <div id="appelSection" class="hidden">
+      <div class="form-group">
+        <label for="typeAppel">Karazana Antso:</label>
+        <select id="typeAppel" onchange="handleCallType()">
+          <option value="">-- Safidio --</option>
+          <option value="Entrant">Entrant</option>
+          <option value="Sortant">Sortant</option>
+        </select>
+      </div>
+
+      <div id="motifContainer" class="form-group hidden">
+        <label for="motif">Motif d'appel:</label>
+        <select id="motif"></select>
+      </div>
+
+      <div id="statutContainer" class="form-group hidden">
+        <label for="statut">Statut d'appel:</label>
+        <select id="statut">
+          <option value="Communication coupée">Communication coupée</option>
+          <option value="Faux numéro">Faux numéro</option>
+          <option value="Kit à récupérer">Kit à récupérer</option>
+          <option value="Kit à récupérer pour réparation">Kit à récupérer pour réparation</option>
+          <option value="Kit déjà récupéré">Kit déjà récupéré</option>
+          <option value="Numéro inexistant">Numéro inexistant</option>
+          <option value="Numéro suspendu">Numéro suspendu</option>
+          <option value="Poste éteint">Poste éteint</option>
+          <option value="Problème de communication">Problème de communication</option>
+          <option value="Qualifié">Qualifié</option>
+          <option value="Répondeur">Répondeur</option>
+          <option value="Titulaire non disponible">Titulaire non disponible</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="commentaire">Fanamarihana (Commentaire):</label>
+        <textarea id="commentaire" rows="3"></textarea>
+      </div>
+
+      <button onclick="submitData()">Tehirizo ny Angona</button>
+    </div>
+
+    <!-- Fizarana COMPLEMENT DU SHEET (Miaraka amin'ny toerana fametrahana Lien) -->
+    <div id="complementSection" class="hidden">
+      <p><b>Ampidiro eto ny rohy (URL) mifanaraka amin'ireo Sheets:</b></p>
+      
+      <div class="link-input-group">
+        <label>Sheet 22 (sy ireo misy X mena / Rohy ivelany):</label>
+        <input type="text" id="urlSheet22" placeholder="https://docs.google.com/spreadsheets/d/...">
+      </div>
+
+      <div class="link-input-group">
+        <label>Paiements reçus Mvola (X mena):</label>
+        <input type="text" id="urlMvola" placeholder="https://docs.google.com/spreadsheets/d/...">
+      </div>
+
+      <div class="link-input-group">
+        <label>Paiements Airtel reçus (X mena):</label>
+        <input type="text" id="urlAirtel" placeholder="https://docs.google.com/spreadsheets/d/...">
+      </div>
+
+      <div class="sheet-links">
+        <button onclick="openSheet('urlSheet22')" class="sheet-btn external">Sokafy ny Sheet 22</button>
+        <button onclick="openSheet('urlMvola')" class="sheet-btn external">Sokafy ny Paiements Mvola</button>
+        <button onclick="openSheet('urlAirtel')" class="sheet-btn external">Sokafy ny Paiements Airtel</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function handleMainChoice() {
+      let val = document.getElementById("choixPrincipal").value;
+      document.getElementById("appelSection").classList.add("hidden");
+      document.getElementById("complementSection").classList.add("hidden");
+
+      if (val === "Appel") {
+        document.getElementById("appelSection").classList.remove("hidden");
+      } else if (val === "Complement") {
+        document.getElementById("complementSection").classList.remove("hidden");
+      }
+    }
+
+    function handleCallType() {
+      let type = document.getElementById("typeAppel").value;
+      let motifSelect = document.getElementById("motif");
+      motifSelect.innerHTML = '<option value="">-- Safidio ny Motif --</option>';
+      
+      document.getElementById("motifContainer").classList.remove("hidden");
+      document.getElementById("statutContainer").classList.remove("hidden");
+
+      let motifs = [];
+      if (type === "Sortant") {
+        motifs = ["Recouvrement", "Call de bienvenue", "Appel manqué", "Enquête", "Information", "Call back", "Erreur de référence", "Fin de traite"];
+      } else if (type === "Entrant") {
+        motifs = ["Réclamation", "Information", "Autre", "Kit à souci", "Batterie", "Câble", "Keypad", "Lampe mère", "Petit lampe"];
+      }
+
+      motifs.forEach(m => {
+        let opt = document.createElement("option");
+        opt.value = m;
+        opt.textContent = m;
+        motifSelect.appendChild(opt);
+      });
+    }
+
+    function openSheet(inputId) {
+      let url = document.getElementById(inputId).value.trim();
+      if (url) {
+        window.open(url, '_blank');
+      } else {
+        alert("Aza fady, apetraho aloha ny rohy (URL) ao amin'ilay efajoro!");
+      }
+    }
+
+    function submitData() {
+      let data = {
+        choixPrincipal: document.getElementById("choixPrincipal").value,
+        typeAppel: document.getElementById("typeAppel").value,
+        motif: document.getElementById("motif").value,
+        statut: document.getElementById("statut").value,
+        commentaire: document.getElementById("commentaire").value
+      };
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          alert(res.message);
+          document.getElementById("commentaire").value = "";
+        })
+        .withFailureHandler(function(err) {
+          alert("Nisy olana: " + err.message);
+        })
+        .saveData(data);
+    }
+  </script>
+</body>
+</html>
