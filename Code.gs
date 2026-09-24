@@ -1,8 +1,10 @@
-# 1. Ampidirina ao amin'ny Git ireo rakitra vaovao (Code.gs sy Index.html)
-git add .
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('Index.html')
+      .setTitle('CRM Masontsika V12');
+}
 
-# 2. Asiana hafatra (Commit) milaza fa voatahiry ny kaody
-git commit -m "Fanavaozana: Fampidirana ny Code.gs sy Index.html ho an'ny CRM V12"
-
-# 3. Alefa mivantana any amin'ny GitHub
-git push origin main
+function saveData(formData) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  // Ampidiro eto ny logika handraketana ny angona araka ny Cahier des Charges V12
+  return "Voatahiry soa aman-tsara!";
+}
